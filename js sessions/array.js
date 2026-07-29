@@ -39,3 +39,46 @@ console.log(marks);
 
 marks.splice(0, 1, "hata dia");
 console.log(marks);
+
+var marks = [123, 23, 555, 3, 3, 23, 2, 32, 3, 2];
+
+// var biggest = marks[0];
+
+// for (var i = 0; i < marks.length; i++) {
+//   var mark = marks[i];
+//   if (mark > biggest) {
+//     biggest = mark;
+//   }
+// }
+
+// console.log(biggest);
+
+// marks.forEach((v, i, arr) => {
+//   console.log(v, i, arr);
+// });
+
+var biggest = marks[0];
+
+marks.forEach((mark) => {
+  if (mark > biggest) {
+    biggest = mark;
+  }
+});
+
+console.log(biggest);
+
+// var cubes = [];
+
+// marks.forEach((mark) => {
+//   cubes.push(mark ** 3);
+// });
+// console.log(cubes);
+
+var cubes = marks.map((mark) => mark ** 3);
+console.log(cubes);
+
+var res = marks.map((mark) => {
+  return { [mark]: mark % 2 === 0 ? "even" : "odd" };
+});
+
+console.log(res);

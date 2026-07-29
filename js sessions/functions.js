@@ -60,3 +60,22 @@ var years_remaining = lifeSpan(
 );
 
 console.log(years_remaining);
+
+// function calcBmi(weight, height) {
+//   return weight / height ** 2;
+// }
+
+// function printBMI(weight, height, bmiFn) {
+//   alert(`Your Bmi is ${bmiFn(weight, height)}`);
+// }
+
+// // printBMI(100, 1.8, calBmi);
+// printBMI(100, 1.8, (weight, height) => {
+//   return weight / height ** 2;
+// });
+
+// iif
+
+// (function () {
+//   alert("IIF");
+// })();
