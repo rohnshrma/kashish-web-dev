@@ -1,4 +1,4 @@
-const testBoard = ["#", "X", "O", "X", "O", "X", "O", "X", "O", "X"];
+var testBoard = ["#", "X", "O", "X", "O", "X", "O", "X", "O", "X"];
 function displayBoard(board) {
   alert(`${board[7]}  |  ${board[8]}  |  ${board[9]}\n
 ----------\n
@@ -10,23 +10,20 @@ ${board[1]}  |  ${board[2]}  |  ${board[3]}`);
 // displayBoard(testBoard);
 
 function player_choice() {
-  while (true) {
-    var choice = prompt("Choose Between X or O : ").toLowerCase();
-
-    if (choice === null) {
-      continue;
-    }
-
-    if (choice == "x") {
-      return { player_1: "X", player_2: "O" };
-    }
-
-    if (choice == "o") {
-      return { player_1: "O", player_2: "X" };
-    }
-
-    alert("Invalid Choice! Please Enter either X or O");
+  var choice = prompt("Choose Between X or O : ").toUpperCase();
+  while (!["X", "O"].includes(choice)) {
+    choice = prompt("Choose Between X or O : ").toUpperCase();
   }
+
+  if (choice == "X") {
+    return { player_1: "X", player_2: "O" };
+  }
+
+  if (choice == "O") {
+    return { player_1: "O", player_2: "X" };
+  }
+
+  alert("Invalid Choice! Please Enter either X or O");
 }
 
 // var choices = player_choice();
@@ -40,7 +37,7 @@ function choose_first() {
   }
 }
 
-// const choice = choose_first();
+// var choice = choose_first();
 // console.log(choice);
 
 function place_marker(board, position, marker) {
@@ -75,13 +72,13 @@ function space_check(board, position) {
   return board[position] === " ";
 }
 
-displayBoard(testBoard);
-console.log(space_check(testBoard, 1));
+// displayBoard(testBoard);
+// console.log(space_check(testBoard, 1));
 
-place_marker(testBoard, 5, " ");
+// place_marker(testBoard, 5, " ");
 
-displayBoard(testBoard);
-console.log(space_check(testBoard, 5));
+// displayBoard(testBoard);
+// console.log(space_check(testBoard, 5));
 
 function full_board_check(board) {
   let isBoardFull = true;
@@ -94,4 +91,92 @@ function full_board_check(board) {
   return isBoardFull;
 }
 
-console.log(full_board_check(testBoard));
+function choose_position(board) {
+  var position = parseInt(prompt("Choose Your Position 1-9 : "));
+
+  while (
+    ![1, 2, 3, 4, 5, 6, 7, 8, 9].includes(position) ||
+    !space_check(board, position)
+  ) {
+    position = parseInt(prompt("Choose Your Position 1-9 : "));
+  }
+
+  return position;
+}
+
+// choose_position(testBoard);
+
+function replay() {
+  return (
+    prompt("Do you want to play again 'Yes' or 'No' : ").toLowerCase()[0] ===
+    "y"
+  );
+}
+
+while (true) {
+  var board = ["#", " ", " ", " ", " ", " ", " ", " ", " ", " "];
+
+  var { player_1, player_2 } = player_choice();
+
+  var turn = choose_first();
+
+  console.log(`${turn} will go first`);
+
+  if (
+    prompt("Ready to play the game [Yes] or [No] : ").toLowerCase() === "yes"
+  ) {
+    var game_on = true;
+  } else {
+    var game_on = false;
+  }
+
+  while (game_on) {
+    if (turn === "Player 1") {
+      alert(`${turn}'s Turn.`);
+      displayBoard(board);
+      position = choose_position(board);
+      place_marker(board, position, player_1);
+
+
+      if (win_check(board, player_1)){
+        alert("Congratulations! Player 1 You've won!")
+        displayBoard(board)
+        game_on = false
+      }else{
+        if (full_board_check(board)){
+          alert("Game Draw!")
+          displayBoard(board)
+          break
+        }else{
+          turn = "Player 2"
+        }
+      }
+
+    } else {
+      alert(`${turn}'s Turn.`);
+      displayBoard(board);
+      position = choose_position(board);
+      place_marker(board, position, player_2);
+
+
+      if (win_check(board, player_2)){
+        alert("Congratulations! Player 2 You've won!")
+        displayBoard(board)
+        game_on = false
+      }else{
+        if (full_board_check(board)){
+          alert("Game Draw!")
+          displayBoard(board)
+          break
+        }else{
+          turn = "Player 1"
+        }
+      }
+    }
+  }
+
+  if (!replay()){
+    break
+  }
+  
+}

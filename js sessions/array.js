@@ -196,3 +196,5 @@ var maxi = marks.reduce((max, cv) => {
 }, marks[0]);
 
 console.log(maxi);
+
+console.log( marks.sort((a,b)=>a-b))
