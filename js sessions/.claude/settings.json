@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch *)",
+      "Bash(GITDIR=\"/Users/rohan/Desktop/Rohan Desktop/Classes/kashish web dev/.git\"; rm \"$GITDIR/refs/heads/main 2\" \"$GITDIR/refs/remotes/origin/main 2\" && echo \"removed\")",
+      "Bash(git pull *)"
+    ],
+    "additionalDirectories": [
+      "/Users/rohan/Desktop/Rohan Desktop/Classes/kashish web dev/.git/refs/heads"
+    ]
+  }
+}

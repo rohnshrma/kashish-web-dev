@@ -1,61 +1,55 @@
 // data is stored in a key : value pair format
 
-
 var car = {
-    model : "mustang",
-    brand : "ford",
-    year : 2023,
-    available_colors : ["Red", "Orange", "Yellow"]
+  model: "mustang",
+  brand: "ford",
+  year: 2023,
+  available_colors: ["Red", "Orange", "Yellow"],
+};
+
+car.year = 2020;
+console.log(car);
+
+car["isIndian"] = false;
+console.log(car);
+
+console.log(car.available_colors);
+console.log(car["available_colors"]);
+
+// constructor function
+function CarCreator(model, brand, year) {
+  // {}
+  console.log(this);
+
+  this.model = model;
+  this.year = year;
+  this.brand = brand;
+  this.info = () => {
+    console.log(`${this.model} by ${this.brand}`);
+  };
 }
 
-car.year = 2020
-console.log(car)
+var newCar = new CarCreator("mustang", "ford", 2020);
+console.log(newCar);
+newCar.info();
 
-car["isIndian"] = false
-console.log(car)
+class Car {
+  // {}
 
-console.log(car.available_colors)
-console.log(car["available_colors"])
+  constructor(model, brand, year) {
+    this.model = model;
+    this.year = year;
+    this.brand = brand;
+  }
 
-
-
-// constructor function 
-function CarCreator(model, brand, year){
-    // {} 
-    console.log(this)
-
-    this.model=model
-    this.year=year
-    this.brand=brand
-this.info = ()=>{
-        console.log(`${this.model} by ${this.brand}`)
-    }
+  info() {
+    console.log(`${this.model} by ${this.brand}`);
+  }
 }
 
-var newCar = new CarCreator("mustang","ford",2020)
-console.log(newCar)
-newCar.info()
-
-
-
-class Car{
-    // {}
-
-    constructor(model,brand, year){
-    this.model=model
-    this.year=year
-    this.brand=brand    }
-    
-    info(){
-        console.log(`${this.model} by ${this.brand}`)
-    }}
-
-
-    var newCar = new Car("mustang","ford",2020)
-console.log(newCar)
-newCar.info()
-
-
+var newCar = new Car("mustang", "ford", 2020);
+console.log(newCar);
+newCar.info();
 
 // practice dataset: array of objects, for some/every/sort tasks
 
@@ -75,6 +69,25 @@ var products = [
 // practical tasks: constructor functions
 
 // 1. write a constructor function Student(name, age, marks) that stores the three as properties
+
+function Student(name, age, marks) {
+  this.name = name;
+  this.marks = marks;
+  this.age = age;
+  this.info = () => `${this.name} (${this.age}) scored ${this.marks} marks.`;
+}
+
+var students = [];
+for (var i = 1; i <= 5; i++) {
+  var name = prompt("Enter name : ").toLowerCase();
+  var marks = parseInt(prompt("Enter marks : "));
+  var age = parseInt(prompt("Enter Age : "));
+
+  students.push(new Student(name, age, marks));
+}
+
+students.forEach((student) => console.log(student));
+
 // 2. add a method inside Student (like info() in CarCreator) that logs "name (age yrs) scored marks"
 // 3. create 5 Student objects using "new" and store them in an array
 // 4. add a method inside Student called hasPassed() that returns true if marks >= 40
@@ -100,3 +113,39 @@ var products = [
 // 18. create the same object (same properties/methods) once with a constructor function and once with a class; log both and compare the output in the console
 // 19. try calling the class version without "new" (e.g. "Student('Amit', 16, 80)") and note the error; try the same with the constructor-function version and note the difference
 // 20. explain (as a comment) one similarity and one difference you observed between the constructor-function version and the class version
+
+function Bankaccount(owner, balance) {
+  this.owner = owner;
+  this.balance = balance;
+  this.mmb = 2000;
+
+  this.checkMmb = () => {
+    if (this.balance < this.mmb) {
+      alert(
+        `Note: Please mainitain a minimum balance of  ₹${this.mmb}\nYou're ${
+          this.mmb - this.balance
+        }`
+      );
+    }
+  };
+
+  this.withdrawl = (amount) => {
+    if (amount <= this.balance) {
+      this.balance -= amount;
+      console.log(this.balance);
+      this.checkMmb();
+    } else {
+      console.log("Insufficient funds");
+    }
+  };
+
+  this.deposit = (amount) => {
+    balance += amount;
+    console.log(balance);
+  };
+}
+
+let newowner = new Bankaccount("Kashish", 2000);
+console.log(newowner);
+newowner.withdrawl(2000);
+newowner.deposit(500);

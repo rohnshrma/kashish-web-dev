@@ -283,3 +283,14 @@ console.log(students.every(student => student.age > 100))
 // 17. sort products by stock ascending, then use some() to find if any of the bottom 3 (lowest stock) also have rating > 4.5
 // 18. write a function isSellable(product) that returns true if stock > 0 and rating >= 4, then use every() to check if the entire products array is sellable, and if not, sort the array to bring non-sellable products to the top
 
+<<<<<<< Updated upstream
+=======
+console.log(maxi);
+
+let numbers = [5, 12, 8, 130, 44, 3, 21, 9, 17, 60];
+let names = ["rohan", "amit", "priya", "neha", "sahil"];
+
+var x = names.map((n, i) => `${n}-${numbers[i]}`);
+
+console.log(x);
+>>>>>>> Stashed changes
