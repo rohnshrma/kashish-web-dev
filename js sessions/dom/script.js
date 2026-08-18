@@ -1,48 +1,37 @@
-// selectors
+// ============================================
+// DOM MANIPULATION - Student Implementation
+// ============================================
 
-// console.log(document.getElementById("main-heading"));
-// console.log(document.getElementsByClassName("para"));
-// console.log(document.getElementsByTagName("button"));
+// STEP 1: Select the main heading element
+// TODO: Use querySelector to select the element with id "main-heading"
+// Store it in a variable called 'head'
 
-// console.log(document.querySelector("#main-heading"));
-// console.log(document.querySelector(".para"));
-// console.log(document.querySelector("p"));
 
-// innertext/textcontent and innerHTML
+// STEP 2: Modify text content
+// TODO: Change the textContent of the heading to "bye world" when the page loads
 
-var head = document.querySelector("#main-heading");
 
-// console.log(head.textContent);
-// console.log(head.innerHTML);
+// STEP 3: Add event listeners to buttons
+// TODO: Select all elements with class "submit"
+// TODO: Add a click event listener to each button
+// TODO: When clicked, the heading text should change to the button's text content
 
-// head.textContent = "bye <i>world</i>";
-// head.innerHTML = "bye <i>world</i>";
 
-// console.log(head.style);
+// STEP 4: Create and add a new element to the DOM
+// TODO: Create a new div element
+// TODO: Set its textContent to "hello world"
+// TODO: Append it to the document body
 
-// head.style.border = "1px solid red";
-// head.style = "border:1px solid red";
 
-// console.log(head.attributes);
-// console.log(head.getAttribute("id"));
+// ============================================
+// BONUS CHALLENGES (Optional)
+// ============================================
 
-// head.setAttribute("class", "hello");
+// BONUS 1: Style manipulation
+// TODO: Add a click event to the heading that changes its border to "1px solid red"
 
-// console.log(head.attributes);
+// BONUS 2: Class manipulation
+// TODO: Use classList to add/remove classes from elements
 
-// console.log(head.classList);
-// head.classList.add("hello");
-// console.log(head.classList);
-// head.classList.remove("hello");
-
-// console.log(head.classList);
-
-head.addEventListener("click", () => {
-  head.textContent = "bye world";
-});
-
-document.querySelectorAll(".submit").forEach((btn) => {
-  btn.addEventListener("click", (e) => {
-    head.textContent = e.target.textContent;
-  });
-});
+// BONUS 3: Attribute manipulation
+// TODO: Get and set attributes using getAttribute/setAttribute
