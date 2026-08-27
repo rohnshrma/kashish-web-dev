@@ -4,26 +4,51 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <form action="/" method="post">
-      <input type="text" placeholder="Enter task name ..." name="task_name" />
-      <button>Add Task</button>
-    </form>
+    <main class="page">
+      <div class="card">
+        <header class="card__header">
+          <h1 class="title">To&nbsp;Do List</h1>
+          <p class="subtitle">
+            <%= tasks.length %> <%= tasks.length === 1 ? "task" : "tasks" %>
+          </p>
+        </header>
 
-    <% if(tasks.length <= 0){ %>
-    <p>No Tasks Yet! Add one.</p>
-    <% }else{ %>
-    <ul>
-      <% tasks.forEach((task)=>{ %>
-      <li>
-        <%= task.name %>
-        <form action="/delete/<%= task._id %>?_method=DELETE" method="post">
-          <button type="submit">DELETE</button>
+        <form class="add-form" action="/" method="post">
+          <input
+            class="add-form__input"
+            type="text"
+            placeholder="Enter task name ..."
+            name="task_name"
+            autocomplete="off"
+            required
+          />
+          <button class="btn btn--primary" type="submit">Add Task</button>
         </form>
-      </li>
-      <% }) %>
-    </ul>
-    <% } %>
+
+        <% if(tasks.length <= 0){ %>
+        <p class="empty-state">No tasks yet — add one above.</p>
+        <% }else{ %>
+        <ul class="task-list">
+          <% tasks.forEach((task, i)=>{ %>
+          <li class="task" style="animation-delay: <%= Math.min(i, 8) * 45 %>ms">
+            <span class="task__name"><%= task.name %></span>
+            <form
+              class="task__delete-form"
+              action="/delete/<%= task._id %>?_method=DELETE"
+              method="post"
+            >
+              <button class="btn btn--delete" type="submit" aria-label="Delete task">
+                &times;
+              </button>
+            </form>
+          </li>
+          <% }) %>
+        </ul>
+        <% } %>
+      </div>
+    </main>
   </body>
 </html>

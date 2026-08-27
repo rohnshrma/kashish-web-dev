@@ -1,0 +1,241 @@
+:root {
+  --bg: #e8ecf3;
+  --clay: #e8ecf3;
+  --shadow-dark: rgba(163, 177, 198, 0.55);
+  --shadow-light: rgba(255, 255, 255, 0.85);
+  --ink: #3d4457;
+  --ink-soft: #7c85a3;
+  --accent: #6c63ff;
+  --accent-ink: #ffffff;
+  --danger: #ff6b6b;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+  font: 100%/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+}
+
+.page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Claymorphism surface: soft dual shadow + inner highlight on a same-tone background */
+.card {
+  width: 100%;
+  max-width: 460px;
+  padding: 40px 36px;
+  border-radius: 32px;
+  background: var(--clay);
+  box-shadow:
+    12px 12px 24px var(--shadow-dark),
+    -12px -12px 24px var(--shadow-light),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.card__header {
+  margin-bottom: 28px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  letter-spacing: 0;
+}
+
+.add-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.add-form__input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 18px;
+  background: var(--clay);
+  color: var(--ink);
+  font-size: 1rem;
+  font-family: inherit;
+  box-shadow:
+    inset 5px 5px 10px var(--shadow-dark),
+    inset -5px -5px 10px var(--shadow-light);
+  transition: box-shadow 200ms var(--ease-out);
+}
+
+.add-form__input::placeholder {
+  color: var(--ink-soft);
+}
+
+.add-form__input:focus {
+  outline: none;
+  box-shadow:
+    inset 5px 5px 10px var(--shadow-dark),
+    inset -5px -5px 10px var(--shadow-light),
+    0 0 0 3px rgba(108, 99, 255, 0.35);
+}
+
+.btn {
+  border: none;
+  border-radius: 18px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn--primary {
+  padding: 14px 22px;
+  font-size: 0.95rem;
+  color: var(--accent-ink);
+  background: var(--accent);
+  box-shadow:
+    6px 6px 14px var(--shadow-dark),
+    -6px -6px 14px var(--shadow-light);
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover {
+    box-shadow:
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light);
+  }
+}
+
+.task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 14px 20px;
+  border-radius: 18px;
+  background: var(--clay);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
+  opacity: 0;
+  animation: task-in 420ms var(--ease-out) forwards;
+}
+
+.task__name {
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+}
+
+.task__delete-form {
+  display: contents;
+}
+
+.btn--delete {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--danger);
+  background: var(--clay);
+  box-shadow:
+    4px 4px 8px var(--shadow-dark),
+    -4px -4px 8px var(--shadow-light);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn--delete:hover {
+    color: #ffffff;
+    background: var(--danger);
+  }
+}
+
+.empty-state {
+  margin: 8px 0 4px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  opacity: 0;
+  animation: fade-in 400ms var(--ease-out) forwards;
+  animation-delay: 80ms;
+}
+
+@keyframes task-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task {
+    animation: fade-in 200ms ease forwards;
+  }
+  .btn:active {
+    transform: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .card {
+    padding: 32px 24px;
+  }
+  .add-form {
+    flex-direction: column;
+  }
+  .btn--primary {
+    width: 100%;
+  }
+}
