@@ -15,10 +15,10 @@
     <p>No Tasks Yet! Add one.</p>
     <% }else{ %>
     <ul>
-      <% tasks.forEach((task , index)=>{ %>
+      <% tasks.forEach((task)=>{ %>
       <li>
-        <%= task %>
-        <form action="/delete/<%= index %>?_method=DELETE" method="post">
+        <%= task.name %>
+        <form action="/delete/<%= task._id %>?_method=DELETE" method="post">
           <button type="submit">DELETE</button>
         </form>
       </li>
