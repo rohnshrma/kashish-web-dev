@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <main class="shell">
+      <!-- ========== header ========== -->
+      <header class="masthead">
+        <div>
+          <h1 class="masthead__title">Expense <span>Tracker</span></h1>
+          <p class="masthead__tag">Log it before you forget it</p>
+        </div>
+
+        <span class="chip">
+          <span class="chip__dot"></span>
+          <%= expenses.length %>
+           logged
+        </span>
+      </header>
+
+      <!-- ========== add expense form ========== -->
+      <form class="composer" action="/" method="POST">
+        <label class="composer__label" for="name">Expense name</label>
+
+        <div class="composer__row">
+          <input
+            class="field"
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Chai, metro card, hosting bill…"
+            minlength="3"
+            required
+            autocomplete="off"
+          />
+          <button class="btn" type="submit">Add</button>
+        </div>
+      </form>
+
+      <!-- ========== expense list ========== -->
+      <section class="ledger">
+        <div class="ledger__head">
+          <h2>Your expenses</h2>
+
+          <span class="ledger__count"><%= expenses.length %> items</span>
+        </div>
+
+     
+          <ul class="ledger__list">
+            <% expenses.forEach((expense, i) => { %>
+              <li class="expense">
+                <span class="expense__index"><%= i + 1 %></span>
+                <div class="expense__body">
+                  <p class="expense__name"><%= expense.name %></p>
+                  <p class="expense__meta">
+                    <%= expense.createdAt.toDateString() %>
+                  </p>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+
+
+          <% if (expenses.length === 0) { %>
+        <div class="empty">
+          <div class="empty__emoji">🧾</div>
+          <p>Nothing logged yet</p>
+        </div>
+          <% } %>
+   
+
+       
+       
+      </section>
+    </main>
+  </body>
+</html>
