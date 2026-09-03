@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inkwell — Compose</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <main class="shell shell--narrow">
+      <!-- ========== top bar ========== -->
+      <header class="topbar">
+        <a class="brand" href="/">
+          <span class="brand__mark">✒</span>
+          <span class="brand__name">Inkwell</span>
+        </a>
+
+        <nav class="nav">
+          <a class="nav__link" href="/">Home</a>
+          <a class="nav__link" href="/blogs">Blogs</a>
+          <a class="nav__link nav__link--active" href="/compose">Compose</a>
+        </nav>
+      </header>
+
+      <!-- ========== page heading ========== -->
+      <section class="hero">
+        <p class="hero__kicker">Nothing saves until you publish</p>
+
+        <h1 class="hero__title">
+          New
+          <span>post</span>
+        </h1>
+      </section>
+
+      <!--
+        TODO (student) — error banner
+
+        Show this banner ONLY when your route passes an `error` message
+        (for example when the title is too short, or a field is blank).
+        Wrap it in an if, and print the message where the sample text is.
+
+        Because it only appears when something went wrong, it is a
+        rarely-seen element — that is why it gets its own little entrance
+        animation in the stylesheet.
+      -->
+      <div class="flash">
+        <span>⚠</span>
+        <span>Sample error message goes here</span>
+      </div>
+
+      <!--
+        TODO (student) — wire up the form
+
+        1. Point `action` at the route that saves a post, and set `method`
+           to the verb used for creating data.
+        2. Leave the `name` attributes exactly as they are — your route will
+           read req.body.title, req.body.author and req.body.content.
+        3. Bonus: if the submit fails and you re-render this page, pass the
+           values back and print them into the `value` attribute (title,
+           author) and between the <textarea> tags (content) so the writer
+           does not lose their work.
+      -->
+      <form class="composer" action="TODO" method="TODO">
+        <div class="field-group">
+          <label class="label" for="title">Title</label>
+          <input
+            class="field"
+            type="text"
+            id="title"
+            name="title"
+            placeholder="Something worth clicking on"
+            minlength="3"
+            maxlength="120"
+            required
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="label" for="author">Author</label>
+          <input
+            class="field"
+            type="text"
+            id="author"
+            name="author"
+            placeholder="Your name"
+            minlength="2"
+            maxlength="60"
+            required
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="label" for="content">Post</label>
+          <textarea
+            class="field field--area"
+            id="content"
+            name="content"
+            placeholder="Start typing. Line breaks are kept exactly as you type them."
+            minlength="10"
+            required
+          ></textarea>
+          <p class="hint">Minimum 10 characters. Plain text only.</p>
+        </div>
+
+        <div class="composer__actions">
+          <button class="btn" type="submit">Publish</button>
+          <a class="btn btn--ghost" href="/blogs">Cancel</a>
+        </div>
+      </form>
+
+      <p class="footnote">Built with Express · EJS · MongoDB</p>
+    </main>
+  </body>
+</html>

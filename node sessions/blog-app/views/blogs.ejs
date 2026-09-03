@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inkwell — Blogs</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <main class="shell">
+      <!-- ========== top bar ========== -->
+      <header class="topbar">
+        <a class="brand" href="/">
+          <span class="brand__mark">✒</span>
+          <span class="brand__name">Inkwell</span>
+        </a>
+
+        <nav class="nav">
+          <a class="nav__link" href="/">Home</a>
+          <a class="nav__link nav__link--active" href="/blogs">Blogs</a>
+          <a class="nav__link" href="/compose">Compose</a>
+        </nav>
+      </header>
+
+      <!-- ========== page heading ========== -->
+      <section class="hero">
+        <p class="hero__kicker">Everything, newest first</p>
+
+        <h1 class="hero__title">
+          The
+          <span>blog</span>
+        </h1>
+
+        <div class="hero__actions">
+          <!-- TODO (student) — post count
+               Print the real number of posts inside this chip,
+               before the word "published". -->
+          <span class="chip">
+            <span class="chip__dot"></span>
+            0 published
+          </span>
+
+          <a class="btn" href="/compose">New post</a>
+        </div>
+      </section>
+
+      <section class="section-head">
+        <h2>All posts</h2>
+
+        <!-- TODO (student) — same count again, formatted as "N total" -->
+        <span class="section-head__count">0 total</span>
+      </section>
+
+      <!--
+        TODO (student) — render every post
+
+        1. Loop over the `posts` array that your route passes in, and repeat
+           the <li class="post"> block below once per post.
+        2. Grab the loop index too — you need it for .post__index (start at 1).
+        3. Fill in the real values:
+             .post__title  -> post title
+             .post__meta   -> author inside <b>, then the created date
+                              (a Date has .toDateString() if you want it short)
+             .post__body   -> the full content of the post
+        4. Delete both sample cards below once the loop works.
+
+        Heads up: the content is user-typed text, so print it with the
+        ESCAPING output tag, not the raw one. Ask yourself which of the two
+        EJS output tags escapes HTML — that's the one you want here.
+      -->
+      <ul class="post-list">
+        <li class="post">
+          <div class="post__top">
+            <span class="post__index">1</span>
+            <h3 class="post__title">Sample post title goes here</h3>
+          </div>
+
+          <p class="post__meta">By <b>Author name</b> · Some date</p>
+
+          <p class="post__body">
+            These two cards exist only to show you the styling and the entrance
+            animation (each card is staggered 60ms after the one above it).
+            Replace them with your loop.
+          </p>
+        </li>
+
+        <li class="post">
+          <div class="post__top">
+            <span class="post__index">2</span>
+            <h3 class="post__title">A second sample post</h3>
+          </div>
+
+          <p class="post__meta">By <b>Someone else</b> · Some other date</p>
+
+          <p class="post__body">
+            Long posts wrap and breathe here. The stylesheet keeps line breaks
+            you typed in the textarea, so paragraphs survive.
+          </p>
+        </li>
+      </ul>
+
+      <!--
+        TODO (student) — empty state
+
+        Show the block below only when `posts` is empty, and hide the list
+        above in that case.
+      -->
+      <div class="empty">
+        <div class="empty__emoji">🗒️</div>
+        <p>No posts yet</p>
+        <a class="btn" href="/compose">Write your first post</a>
+      </div>
+
+      <p class="footnote">Built with Express · EJS · MongoDB</p>
+    </main>
+  </body>
+</html>

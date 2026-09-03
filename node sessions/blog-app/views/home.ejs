@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inkwell — Home</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <main class="shell">
+      <!-- ========== top bar ========== -->
+      <header class="topbar">
+        <a class="brand" href="/">
+          <span class="brand__mark">✒</span>
+          <span class="brand__name">Inkwell</span>
+        </a>
+
+        <nav class="nav">
+          <a class="nav__link nav__link--active" href="/">Home</a>
+          <a class="nav__link" href="/blogs">Blogs</a>
+          <a class="nav__link" href="/compose">Compose</a>
+        </nav>
+      </header>
+
+      <!-- ========== hero ========== -->
+      <section class="hero">
+        <p class="hero__kicker">A tiny blog, built by hand</p>
+
+        <h1 class="hero__title">
+          Write it
+          <span>down</span>
+        </h1>
+
+        <p class="hero__lede">
+          No drafts, no dashboards, no distractions. Type a title, type a
+          thought, hit publish. Everything you write lands on the blogs page,
+          newest first.
+        </p>
+
+        <div class="hero__actions">
+          <a class="btn" href="/compose">Start writing</a>
+          <a class="btn btn--ghost" href="/blogs">Read the blog</a>
+        </div>
+      </section>
+
+      <!-- ========== latest posts ========== -->
+      <section class="section-head">
+        <h2>Latest</h2>
+
+        <!-- TODO (student) — post count
+             Replace the hardcoded "0 posts" below with the real number.
+             The route that renders this page should pass a `posts` array,
+             so print its length here, followed by the word "posts". -->
+        <span class="section-head__count">0 posts</span>
+      </section>
+
+      <!--
+        TODO (student) — show the 3 most recent posts
+
+        1. Wrap the <li class="post"> block below in a loop over `posts`.
+        2. Only the first 3 should show here (slice the array in the route,
+           or stop the loop after index 2 — your call).
+        3. Fill in the real values:
+             .post__index   -> the loop counter, starting at 1
+             .post__title   -> the post's title
+             .post__meta    -> the author inside <b>, then the created date
+             .post__body    -> a short preview of the content
+                               (first ~120 characters is plenty here)
+        4. Delete this sample card once your loop renders real data.
+      -->
+      <ul class="post-list">
+        <li class="post">
+          <div class="post__top">
+            <span class="post__index">1</span>
+            <h3 class="post__title">Sample post title goes here</h3>
+          </div>
+
+          <p class="post__meta">By <b>Author name</b> · Some date</p>
+
+          <p class="post__body">
+            This card is only here so you can see the styling. Once your EJS
+            loop is working, delete it and let the real posts fill this list.
+          </p>
+        </li>
+      </ul>
+
+      <!--
+        TODO (student) — empty state
+
+        When `posts` is empty, this list should be hidden and the block below
+        shown instead. Use an if / else around the two blocks.
+      -->
+      <div class="empty">
+        <div class="empty__emoji">🪶</div>
+        <p>Nothing published yet</p>
+        <a class="btn" href="/compose">Write the first one</a>
+      </div>
+
+      <p class="footnote">Built with Express · EJS · MongoDB</p>
+    </main>
+  </body>
+</html>
