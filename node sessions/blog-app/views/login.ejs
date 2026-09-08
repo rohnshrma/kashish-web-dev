@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inkwell — Log in</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <main class="shell shell--narrow">
+      <!-- ========== top bar ========== -->
+      <header class="topbar">
+        <a class="brand" href="/">
+          <span class="brand__mark">✒</span>
+          <span class="brand__name">Inkwell</span>
+        </a>
+
+        <nav class="nav">
+          <a class="nav__link" href="/">Home</a>
+          <a class="nav__link nav__link--active" href="/login">Log in</a>
+          <a class="nav__link" href="/register">Register</a>
+        </nav>
+      </header>
+
+      <!-- ========== page heading ========== -->
+      <section class="hero">
+        <p class="hero__kicker">Pick up where you left off</p>
+
+        <h1 class="hero__title">
+          Welcome
+          <span>back</span>
+        </h1>
+      </section>
+
+      <form class="composer" action="/login" method="post">
+        <div class="field-group">
+          <label class="label" for="email">Email</label>
+          <input
+            class="field"
+            type="email"
+            id="email"
+            name="email"
+            placeholder="you@example.com"
+            maxlength="120"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="label" for="password">Password</label>
+          <input
+            class="field"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Your password"
+            minlength="8"
+            maxlength="120"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        <div class="composer__actions">
+          <button class="btn" type="submit">Log in</button>
+          <a class="btn btn--ghost" href="/register">Create account</a>
+        </div>
+      </form>
+
+      <p class="footnote">Built with Express · EJS · MongoDB</p>
+    </main>
+  </body>
+</html>
