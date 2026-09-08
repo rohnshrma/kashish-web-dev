@@ -53,9 +53,9 @@ app.post("/login", async (req, res) => {
       res.redirect("/register");
     }
 
-    if (user.password !== password) {
+    if (!(await bcrypt.compare(password, user.password))) {
       console.log("Invalid password");
-      res.redirect("/");
+      res.redirect("/login");
     }
     res.render("compose");
   } catch (err) {
@@ -74,7 +74,7 @@ app.post("/register", async (req, res) => {
 
     const newUser = await User.create({
       email: email,
-      password: password,
+      password: await bcrypt.hash(password, 10),
     });
 
     console.log(newUser);
