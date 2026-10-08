@@ -3,6 +3,7 @@ import Card from "./components/Card";
 import Counter from "./components/Counter";
 import Header from "./components/Header";
 import pokemons from "./data";
+import Form from "./components/Form";
 
 function App() {
   const [theme, setTheme] = useState("light");
@@ -14,6 +15,8 @@ function App() {
   return (
     <div>
       <Header txt="React App" theme={theme} />
+
+      <Form />
 
       <Counter />
 
