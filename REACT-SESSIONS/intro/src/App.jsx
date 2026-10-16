@@ -16,7 +16,7 @@ function App() {
     <div>
       <Header txt="React App" theme={theme} />
 
-      <Form />
+      {/* <Form /> */}
 
       <Counter />
 
