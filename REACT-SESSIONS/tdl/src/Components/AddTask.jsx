@@ -1,5 +1,6 @@
-import { useReducer } from "react";
+import { useContext, useReducer } from "react";
 import { v4 as uuidv4 } from "uuid";
+import TaskContext from "../TaskContext";
 
 const initialState = {
   title: "",
@@ -20,8 +21,10 @@ const taskReducer = (state, action) => {
   return initialState;
 };
 
-const AddTask = (props) => {
+const AddTask = () => {
   const [task, dispatch] = useReducer(taskReducer, initialState);
+
+  const { addTaskHandler } = useContext(TaskContext);
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
@@ -36,7 +39,7 @@ const AddTask = (props) => {
       id: uuidv4(),
     };
 
-    props.onAdd(newTask);
+    addTaskHandler(newTask);
 
     dispatch({ type: "RESET" });
   };
