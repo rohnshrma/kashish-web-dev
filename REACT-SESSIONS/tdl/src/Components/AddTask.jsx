@@ -7,30 +7,25 @@ const initialState = {
 };
 
 const taskReducer = (state, action) => {
-  if (action.type === "TITLE") {
+  if (action.type === "title" || action.type === "description") {
     return {
-      title: action.payload,
-      description: state.description,
+      ...state, // copy previous/ current state
+      [action.type]: action.payload, // overwrite
     };
+  }
+  if (action.type === "RESET") {
+    return initialState;
   }
 
-  if (action.type === "DESCRIPTION") {
-    return {
-      description: action.payload,
-      title: state.title,
-    };
-  }
   return initialState;
 };
 
 const AddTask = (props) => {
   const [task, dispatch] = useReducer(taskReducer, initialState);
 
-  const titleChangeHandler = (e) => {
-    dispatch({ type: "TITLE", payload: e.target.value });
-  };
-  const descChangeHandler = (e) => {
-    dispatch({ type: "DESCRIPTION", payload: e.target.value });
+  const changeHandler = (e) => {
+    const { name, value } = e.target;
+    dispatch({ type: name, payload: value });
   };
 
   const submitHandler = (e) => {
@@ -42,21 +37,27 @@ const AddTask = (props) => {
     };
 
     props.onAdd(newTask);
+
+    dispatch({ type: "RESET" });
   };
 
   return (
     <form className="add-task" onSubmit={submitHandler}>
       <div>
         <input
-          onChange={titleChangeHandler}
+          onChange={changeHandler}
           type="text"
+          name="title"
+          value={task.title}
           placeholder="task name..."
         />
       </div>
       <div>
         <input
-          onChange={descChangeHandler}
+          onChange={changeHandler}
           type="text"
+          name="description"
+          value={task.description}
           placeholder="task description..."
         />
       </div>

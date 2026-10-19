@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Header from "./Components/Header";
 import AddTask from "./Components/AddTask";
-import Task from "./Components/Task";
+
+import TaskList from "./Components/TaskList";
 
 const App = () => {
   const [tasks, setTasks] = useState([]);
@@ -12,15 +13,18 @@ const App = () => {
       return [newTask, ...prevTasks];
     });
   };
+  const removeTaskHandler = (id) => {
+    setTasks((prevTasks) => {
+      return prevTasks.filter((task) => task.id !== id);
+    });
+  };
 
   console.log(tasks);
   return (
     <div className="App">
       <Header />
       <AddTask onAdd={addTaskHandler} />
-      {tasks.map((taskObj) => {
-        return <Task task={taskObj} key={taskObj.id} />;
-      })}
+      <TaskList onRemove={removeTaskHandler} tasks={tasks} />
     </div>
   );
 };
