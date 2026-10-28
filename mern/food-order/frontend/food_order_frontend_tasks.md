@@ -7,7 +7,9 @@ Build the **frontend** for the Food Order API (see `../backend/food_order_api_as
 There are two kinds of people using the app:
 
 - **User (customer):** sees the menu, fills a cart, places a **dine-in** (books a table) or **delivery** (gives an address) order, and tracks their orders.
-- **Admin (restaurant owner):** manages the menu, categories, tables and orders.
+- **Admin (restaurant owner):** manages the menu and moves orders through their statuses.
+
+**Kept small on purpose:** categories and tables are seeded by the backend, so there are no screens for them. There is also no stats dashboard, no profile screen and no saved addresses.
 
 One app, two sets of screens. Which set you see depends on the `role` the backend sends after login.
 
@@ -24,12 +26,133 @@ One app, two sets of screens. Which set you see depends on the `role` the backen
 | Controlled forms (`value` + `onChange`) | UI libraries (MUI, Bootstrap, etc.) |
 | `useReducer` with `dispatch({ type, payload })` | Custom hooks |
 | `createContext`, a Provider, `useContext` | Debounce, polling, `setInterval` |
-| Inline styles / conditional styles | |
-| Conditional rendering (`&&`, ternary, early `return`) | |
+| Inline styles / conditional styles | `react-router-dom`, protected routes, `<Link>`, `useNavigate` |
+| Conditional rendering (`&&`, ternary, early `return`) | Redux, Redux Toolkit, Zustand, React Query |
+| | Optimisation: `React.memo`, `useMemo`, `useCallback`, `lazy` / `Suspense`, code splitting |
 
-**One new thing is allowed, because the backend needs it:** `axios` (or `fetch`) to call the API using `async / await` inside event handlers. Nothing else is new.
+**New things allowed, because the backend needs them:** `axios` (or `fetch`), `async / await`, and a few form controls (`<select>`, checkbox, date-time input). They are explained in the box below. Nothing else is new.
 
 > Data does **not** need to survive a page refresh. After a refresh the person simply logs in again. Keep the token in state (inside the context), not in the browser storage.
+
+> **Do not worry about speed.** Do not try to make the app "faster" with memoisation or lazy loading. We have not covered it and this app is small. A simple, readable app is the goal.
+
+---
+
+## New things you will meet (mini-lesson)
+
+Read this once before Phase 1. Each item is small and builds on what you already know.
+
+### 1. Calling an API with `axios`
+
+An API call takes time, so it returns a **promise**. `async / await` lets us write it like normal top-to-bottom code. Put the call inside an event handler or a context function.
+
+```
+import axios from "axios";
+
+const loginHandler = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post("http://localhost:5000/api/auth/login", {
+      email,
+      password,
+    });
+    console.log(response.data);      // the JSON sent by the backend
+  } catch (err) {
+    console.log(err.response?.data?.message);   // the backend's error message
+  }
+};
+```
+
+- `await` waits for the reply before moving to the next line.
+- `try / catch` handles failure. A `400` or `401` from the backend lands in `catch`.
+- The reply is always inside `response.data`.
+- `err.response?.data?.message` means "if these exist, give me the message, otherwise `undefined`" (no crash).
+- Install with `npm i axios`.
+
+### 2. Loading and error state around a call
+
+Every call needs three `useState` values: the data, a `loading` flag and an `error` message.
+
+```
+const [items, setItems] = useState([]);
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState("");
+
+const loadMenu = async () => {
+  try {
+    setLoading(true);
+    setError("");
+    const response = await axios.get(API_URL + "/menu");
+    setItems(response.data.data);            // check the real shape in Postman
+  } catch (err) {
+    setError(err.response?.data?.message || "Could not load menu");
+  } finally {
+    setLoading(false);                       // runs on success AND failure
+  }
+};
+```
+
+Then show it with conditional rendering: `loading` → "Loading...", `error` → the message, empty list → "Nothing here yet".
+
+### 3. Sending the token
+
+Protected endpoints need a header. Pass it as the third argument (second for `get` and `delete`):
+
+```
+await axios.get(API_URL + "/cart", {
+  headers: { Authorization: `Bearer ${token}` },
+});
+```
+
+### 4. `<select>`, checkbox and date-time inputs
+
+They are controlled exactly like a text input. Only the property differs.
+
+```
+// dropdown: value + onChange
+<select value={category} onChange={(e) => setCategory(e.target.value)}>
+  <option value="">All</option>
+  {categories.map((c) => (
+    <option key={c._id} value={c._id}>{c.name}</option>
+  ))}
+</select>
+
+// checkbox: checked + e.target.checked  (NOT value)
+<input
+  type="checkbox"
+  checked={isVeg}
+  onChange={(e) => setIsVeg(e.target.checked)}
+/>
+
+// date and time: value is a string like "2026-10-30T19:30"
+<input
+  type="datetime-local"
+  value={time}
+  onChange={(e) => setTime(e.target.value)}
+/>
+```
+
+In a `useReducer` form, a checkbox sends `e.target.checked` as the payload, a text field sends `e.target.value`.
+
+### 5. Hiding screens by role (our "protected screens")
+
+Without a router there are no protected routes. We do the same job by hand with conditional rendering. Check `user` and `user.role` **before** showing the component:
+
+```
+{page === "admin-orders" && user?.role === "admin" && <AdminOrders />}
+{page === "cart" && !user && <Login />}
+```
+
+Remember: this only hides the screen for convenience. The **backend** is the real security, it will return `401` / `403` anyway.
+
+### 6. What we are NOT doing (and why)
+
+| You may have heard of | Why not now |
+| --- | --- |
+| `react-router-dom` and protected routes | Our `page` state + conditional rendering does the same for this size of app. You will learn the real router next. |
+| Redux | Context API is enough here. Redux comes after you are comfortable with Context. |
+| `memo`, `useMemo`, `useCallback`, lazy loading | These are speed tricks. First make it work, then learn when it actually needs speeding up. |
+| `useEffect` | Not covered yet, so we load data on a click or after login. |
 
 ---
 
@@ -69,12 +192,8 @@ main.jsx
                 ├── MyOrders
                 │   └── OrderCard
                 ├── OrderDetail
-                ├── Profile
                 └── Admin screens
-                    ├── Dashboard
                     ├── ManageMenu       (MenuForm + list)
-                    ├── ManageCategories
-                    ├── ManageTables
                     └── AdminOrders      (list + status buttons)
 ```
 
@@ -102,12 +221,8 @@ food-order/frontend/
         ├── MyOrders.jsx
         ├── OrderCard.jsx
         ├── OrderDetail.jsx
-        ├── Profile.jsx
         └── admin/
-            ├── Dashboard.jsx
             ├── ManageMenu.jsx
-            ├── ManageCategories.jsx
-            ├── ManageTables.jsx
             └── AdminOrders.jsx
 ```
 
@@ -121,13 +236,13 @@ Send `Authorization: Bearer <token>` on every protected call. Before you write e
 
 | Area | Endpoints |
 | --- | --- |
-| Auth | `POST /auth/register`, `POST /auth/login`, `GET` and `PUT /auth/me`, `POST /auth/me/addresses`, `DELETE /auth/me/addresses/:id` |
-| Categories | `GET /categories`; admin: `POST`, `PUT /:id`, `DELETE /:id` |
-| Menu | `GET /menu` (`category`, `isVeg`, `search`, `minPrice`, `maxPrice`, `page`, `limit`, `sort`), `GET /menu/:id`; admin: `POST`, `PUT /:id`, `PATCH /:id/availability`, `DELETE /:id` |
-| Tables | admin: `GET`, `POST`, `PUT /:id`, `DELETE /:id`; user: `GET /tables/available?guests=&time=` |
+| Auth | `POST /auth/register`, `POST /auth/login` |
+| Categories | `GET /categories` (seeded, read only) |
+| Menu | `GET /menu` (`category`, `isVeg`, `search`, `minPrice`, `maxPrice`, `page`, `limit`, `sort`); admin: `POST`, `PUT /:id`, `PATCH /:id/availability`, `DELETE /:id` |
+| Tables | user: `GET /tables/available?guests=&time=` (tables are seeded) |
 | Cart (user) | `GET /cart`, `POST /cart`, `PUT /cart/:menuItemId`, `DELETE /cart/:menuItemId`, `DELETE /cart` |
 | Orders (user) | `POST /orders`, `GET /orders/my`, `GET /orders/:id`, `PATCH /orders/:id/cancel` |
-| Admin | `GET /admin/orders`, `PATCH /admin/orders/:id/status`, `PATCH /admin/orders/:id/payment`, `GET /admin/stats` |
+| Admin | `GET /admin/orders`, `PATCH /admin/orders/:id/status`, `PATCH /admin/orders/:id/payment` |
 
 > **Tip:** values from an `<input>` are always **strings**. Convert `price`, `guests`, `quantity` etc. to numbers before sending.
 
@@ -146,7 +261,7 @@ Send `Authorization: Bearer <token>` on every protected call. Before you write e
 user types in Login form  (useReducer for email + password)
   → onSubmit → preventDefault → login(email, password) from context
   → context calls POST /auth/login, saves token + user in state
-  → goTo("admin-dashboard") if role is admin, else goTo("menu")
+  → goTo("admin-orders") if role is admin, else goTo("menu")
 ```
 Show the backend `message` if it fails (`err.response?.data?.message`). Do **not** send a `role` field while registering.
 
@@ -215,18 +330,18 @@ Controlled forms with `useReducer`, error message, button disabled while the req
 
 **Check:**
 - Wrong password shows "Invalid credentials".
-- Admin lands on the dashboard, user lands on the menu.
+- Admin lands on the orders screen, user lands on the menu.
 - Logout brings you back to the login screen.
 
 ---
 
-### Phase 2: Navbar and Menu (3 hrs)
+### Phase 2: Navbar and Menu (2.5 hrs)
 
 **Task 2.1: Navbar (0.5 hr)**
 Different links using conditional rendering:
 - Not logged in: Menu, Login, Register.
-- User: Menu, Cart (with count), My Orders, Profile, Logout.
-- Admin: Dashboard, Menu, Categories, Tables, Orders, Logout.
+- User: Menu, Cart (with count), My Orders, Logout.
+- Admin: Manage Menu, Orders, Logout.
 
 **Task 2.2: Menu screen (1.5 hrs)**
 1. Load categories and menu when the Menu link is clicked.
@@ -240,9 +355,7 @@ Different links using conditional rendering:
 - Not logged in → send to login.
 - Admin → hide the button.
 - Show a small message in the page for success or failure (no `alert()`).
-
-**Task 2.4: Sold out items (0.5 hr)**
-If the backend returns an item with `isAvailable: false` (admin view), show "Sold out" and disable the button.
+- If the backend returns an item with `isAvailable: false` (admin view), show "Sold out" and disable the button.
 
 **Check:**
 - Each filter works alone and together.
@@ -271,7 +384,7 @@ Follow the checkout flow above. One `useReducer` can hold all the form fields; `
 
 ---
 
-### Phase 4: My Orders and Profile (2.5 hrs)
+### Phase 4: My Orders (2 hrs)
 
 **Task 4.1: My Orders (1 hr)**
 Load `GET /orders/my` on click. `OrderCard` shows id, date, type, status, total, and a "View" button. Add two dropdowns to filter by status and type.
@@ -282,35 +395,25 @@ Load `GET /orders/my` on click. `OrderCard` shows id, date, type, status, total,
 - "Cancel order" button, visible **only** when the status is `placed`. Ask "Are you sure?" with a second button on the page (do not use `window.confirm`).
 - A "Refresh" button to get the latest status.
 
-**Task 4.3: Profile (0.5 hr)**
-Edit name and phone. List saved addresses with add and delete.
-
 **Check:**
 - Opening another person's order shows a clear "not allowed" message, not a blank page.
 - Cancel button disappears once the admin confirms the order.
 
 ---
 
-### Phase 5: Admin Screens (3 hrs)
+### Phase 5: Admin Screens (2 hrs)
 
-**Task 5.1: Dashboard (0.5 hr)**
-Show `GET /admin/stats` as simple cards and lists: total orders, orders today, revenue today and total, orders by type, orders by status, top 5 items.
-
-**Task 5.2: Manage menu and categories (1 hr)**
+**Task 5.1: Manage menu (1 hr)**
 - List all items with an availability toggle, Edit and Delete.
-- Menu form (add and edit in the same form, like `ProductForm` in the inventory assignment): name, description, price, category, image URL, veg, preparation time.
-- Categories: list, add, rename, delete. Show the backend message when delete is blocked.
+- Menu form (add and edit in the same form, like `ProductForm` in the inventory assignment): name, description, price, category (a dropdown filled from `GET /categories`), image URL, veg, preparation time.
 
-**Task 5.3: Manage tables (0.5 hr)**
-List number, capacity, status. Add, edit, delete. Disable delete for reserved or occupied tables.
-
-**Task 5.4: Admin orders (1 hr)**
+**Task 5.2: Admin orders (1 hr)**
 List with status and type filters. Show only the **next valid status** button, a "Mark cash as paid" button, and Cancel (only for `placed` or `confirmed`).
 
 **Check:**
 - A user account cannot see any admin screen, and the admin has no Cart link.
 - Take one dine-in and one delivery order through every status.
-- Completing a dine-in order makes the table `available` again.
+- After a dine-in order is completed, the same table shows up again in "Find tables" at checkout.
 
 ---
 
@@ -328,12 +431,12 @@ List with status and type filters. Show only the **next valid status** button, a
 | Phase | Hours |
 | --- | --- |
 | 1. Setup and Login | 3 |
-| 2. Navbar and Menu | 3 |
+| 2. Navbar and Menu | 2.5 |
 | 3. Cart and Checkout | 3.5 |
-| 4. My Orders and Profile | 2.5 |
-| 5. Admin Screens | 3 |
+| 4. My Orders | 2 |
+| 5. Admin Screens | 2 |
 | 6. Clean-up | 1 |
-| **Total** | **16** |
+| **Total** | **14** |
 
 ## Who sees what
 
@@ -343,14 +446,15 @@ List with status and type filters. Show only the **next valid status** button, a
 | Login / Register | ✅ | ❌ | ❌ |
 | Cart, Checkout | ❌ | ✅ | ❌ |
 | My Orders, Order detail | ❌ | ✅ | ❌ |
-| Profile | ❌ | ✅ | ✅ |
-| Dashboard, Manage menu / categories / tables | ❌ | ❌ | ✅ |
+| Manage menu | ❌ | ❌ | ✅ |
 | Admin orders | ❌ | ❌ | ✅ |
 
 ## Submission Checklist
 - [ ] Runs with `npm run dev` and talks to the backend
 - [ ] Only the topics from the Rules table are used (plus `axios`)
-- [ ] No `useEffect`, no router, no `localStorage`
+- [ ] No `useEffect`, no `react-router-dom`, no `localStorage`
+- [ ] No Redux and no optimisation tricks (`memo`, `useMemo`, `useCallback`, `lazy`)
+- [ ] Screens are hidden by role using conditional rendering, not a router
 - [ ] The API URL is written only in `api.js`
 - [ ] Contexts, components and admin screens are in separate files as shown above
 - [ ] Every screen shows loading, error and empty messages
