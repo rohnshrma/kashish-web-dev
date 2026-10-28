@@ -1,303 +1,358 @@
-# Food Order App: React SPA Frontend (Admin + User)
+# Assignment: Food Order App (React SPA with Context API)
 
-**Stack:** React (Vite), React Router, Axios, Context API (+ `useReducer` where it helps)
-**Backend:** the Food Order API in `../backend` (Express, MongoDB, JWT)
-**Time:** 16 hours, 5 phases
-**Roles:** `admin` (restaurant owner), `user` (customer). One app, two experiences, chosen by `user.role`.
+## Goal
 
-A single-page app for the Food Order API. A customer browses the menu, fills a cart and places a **dine-in** (books a table) or **delivery** (gives an address) order. The admin manages the menu, tables and orders from a dashboard.
+Build the **frontend** for the Food Order API (see `../backend/food_order_api_assignment.md`) as a single-page React app, using the same style as our **intro** and **tdl** apps.
 
-Follow the code pattern from `REACT-SESSIONS/tdl`: function components with default exports, state shared through a Context provider wrapped in `main.jsx`, small components that read context with a custom hook, one component per file.
+There are two kinds of people using the app:
+
+- **User (customer):** sees the menu, fills a cart, places a **dine-in** (books a table) or **delivery** (gives an address) order, and tracks their orders.
+- **Admin (restaurant owner):** manages the menu, categories, tables and orders.
+
+One app, two sets of screens. Which set you see depends on the `role` the backend sends after login.
 
 ---
 
-## Folder Structure
+## Rules: use only what we have covered
+
+| Allowed | Not allowed (not covered yet) |
+| --- | --- |
+| Components, JSX, props, `children` | `useEffect`, `useRef`, `useMemo` |
+| `.map()` with `key`, `.filter()`, spread `...` | React Router or any routing library |
+| `useState` | `localStorage`, `sessionStorage` |
+| Events (`onClick`, `onChange`, `onSubmit`) | Redux or any state library |
+| Controlled forms (`value` + `onChange`) | UI libraries (MUI, Bootstrap, etc.) |
+| `useReducer` with `dispatch({ type, payload })` | Custom hooks |
+| `createContext`, a Provider, `useContext` | Debounce, polling, `setInterval` |
+| Inline styles / conditional styles | |
+| Conditional rendering (`&&`, ternary, early `return`) | |
+
+**One new thing is allowed, because the backend needs it:** `axios` (or `fetch`) to call the API using `async / await` inside event handlers. Nothing else is new.
+
+> Data does **not** need to survive a page refresh. After a refresh the person simply logs in again. Keep the token in state (inside the context), not in the browser storage.
+
+---
+
+## How do we move between screens without a router?
+
+We do not have React Router, so keep **one state value** called `page` (for example `"menu"`, `"cart"`, `"checkout"`, `"orders"`, `"admin-orders"`). `App` reads it and shows the matching component using conditional rendering.
 
 ```
-frontend/
-├── index.html
-├── package.json
-├── .env                      # VITE_API_URL=http://localhost:5000/api
-├── .env.example
+const { page } = useContext(NavContext);
+
+{page === "menu" && <Menu />}
+{page === "cart" && <Cart />}
+```
+
+Keep `page` and a `goTo(pageName)` function in a small `NavContext`, so any component (for example Checkout, after the order is placed) can change the screen without props drilling.
+
+> **Hint (no `useEffect`):** normally we would load data when a screen opens. We cannot do that here, so load the data **at the moment of an event**: after login succeeds, when the person clicks a navbar link, or when they press "Apply filters". Think about which click should trigger which API call, and be ready to explain your choice.
+
+---
+
+## Component tree
+
+```
+main.jsx
+└── NavContextProvider
+    └── AuthContextProvider          ← user, token, login, register, logout
+        └── CartContextProvider      ← cart + cart functions
+            └── App                  ← shows one page based on `page` and `user.role`
+                ├── Navbar
+                ├── Login / Register
+                ├── Menu
+                │   ├── MenuFilters
+                │   └── MenuCard
+                ├── Cart
+                │   └── CartItem
+                ├── Checkout
+                ├── MyOrders
+                │   └── OrderCard
+                ├── OrderDetail
+                ├── Profile
+                └── Admin screens
+                    ├── Dashboard
+                    ├── ManageMenu       (MenuForm + list)
+                    ├── ManageCategories
+                    ├── ManageTables
+                    └── AdminOrders      (list + status buttons)
+```
+
+Folder structure to follow (same style as `tdl`):
+
+```
+food-order/frontend/
 └── src/
-    ├── main.jsx              # wraps <App/> in the providers + <BrowserRouter>
-    ├── App.jsx               # route table
-    ├── api/
-    │   └── axios.js          # axios instance + token interceptor
-    ├── context/
-    │   ├── AuthContext.jsx   # user, token, login, register, logout
-    │   ├── CartContext.jsx   # cart, add/update/remove/clear, total
-    │   └── MenuContext.jsx   # menu list + filters (optional)
-    ├── routes/
-    │   ├── ProtectedRoute.jsx   # must be logged in
-    │   └── RoleRoute.jsx        # must have a given role
-    ├── components/
-    │   ├── Navbar.jsx
-    │   ├── Loader.jsx
-    │   ├── ErrorMessage.jsx
-    │   ├── MenuCard.jsx
-    │   ├── MenuFilters.jsx
-    │   ├── Pagination.jsx
-    │   ├── CartItem.jsx
-    │   ├── OrderCard.jsx
-    │   └── StatusBadge.jsx
-    └── pages/
-        ├── Home.jsx
+    ├── main.jsx
+    ├── App.jsx
+    ├── api.js                    ← axios instance with the base URL
+    ├── NavContext.jsx
+    ├── AuthContext.jsx
+    ├── CartContext.jsx
+    └── Components/
+        ├── Navbar.jsx
         ├── Login.jsx
         ├── Register.jsx
         ├── Menu.jsx
+        ├── MenuFilters.jsx
+        ├── MenuCard.jsx
         ├── Cart.jsx
+        ├── CartItem.jsx
         ├── Checkout.jsx
         ├── MyOrders.jsx
+        ├── OrderCard.jsx
         ├── OrderDetail.jsx
         ├── Profile.jsx
-        ├── NotFound.jsx
         └── admin/
             ├── Dashboard.jsx
             ├── ManageMenu.jsx
             ├── ManageCategories.jsx
             ├── ManageTables.jsx
-            ├── AdminOrders.jsx
-            ├── AdminOrderDetail.jsx
-            └── AdminUsers.jsx
+            └── AdminOrders.jsx
 ```
 
-**Rule of thumb:** pages fetch and compose, components only display, context holds shared state, `api/axios.js` is the only place that knows the base URL.
+**Rule of thumb:** contexts hold shared data and functions, components display it, and only `api.js` knows the backend URL.
 
 ---
 
-## Backend Contract (what the frontend talks to)
+## What the backend gives us
 
-Every request goes through the axios instance. Send `Authorization: Bearer <token>` on protected routes.
+Send `Authorization: Bearer <token>` on every protected call. Before you write each function, hit the endpoint once in Postman and note the exact shape of the response (is the list inside `data`? `menu`? `items`?). Write that as a comment above the function.
 
 | Area | Endpoints |
-|---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `GET/PUT /auth/me`, `POST /auth/me/addresses`, `DELETE /auth/me/addresses/:id` |
+| --- | --- |
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET` and `PUT /auth/me`, `POST /auth/me/addresses`, `DELETE /auth/me/addresses/:id` |
 | Categories | `GET /categories`; admin: `POST`, `PUT /:id`, `DELETE /:id` |
-| Menu | `GET /menu` (`category, isVeg, search, minPrice, maxPrice, page, limit, sort`), `GET /menu/:id`; admin: `POST`, `PUT /:id`, `PATCH /:id/availability`, `DELETE /:id` |
-| Tables | admin: `GET/POST /tables`, `PUT/DELETE /tables/:id`; user: `GET /tables/available?guests=&time=` |
+| Menu | `GET /menu` (`category`, `isVeg`, `search`, `minPrice`, `maxPrice`, `page`, `limit`, `sort`), `GET /menu/:id`; admin: `POST`, `PUT /:id`, `PATCH /:id/availability`, `DELETE /:id` |
+| Tables | admin: `GET`, `POST`, `PUT /:id`, `DELETE /:id`; user: `GET /tables/available?guests=&time=` |
 | Cart (user) | `GET /cart`, `POST /cart`, `PUT /cart/:menuItemId`, `DELETE /cart/:menuItemId`, `DELETE /cart` |
 | Orders (user) | `POST /orders`, `GET /orders/my`, `GET /orders/:id`, `PATCH /orders/:id/cancel` |
-| Admin | `GET /admin/orders`, `GET /admin/orders/:id`, `PATCH /admin/orders/:id/status`, `PATCH /admin/orders/:id/payment`, `GET /admin/stats`, `GET /admin/users`, `GET /admin/users/:id/orders` |
+| Admin | `GET /admin/orders`, `PATCH /admin/orders/:id/status`, `PATCH /admin/orders/:id/payment`, `GET /admin/stats` |
 
-> Check the real response shape in Postman before writing each context function (for example whether the list sits under `data`, `menu` or `items`). Write the shape you find in a comment above the function.
-
----
-
-## Phase 1: Setup, Routing and Auth (4 hrs)
-
-### Task 1.1: Project setup (0.5 hr)
-1. `npm create vite@latest frontend -- --template react`, then `npm i axios react-router-dom`.
-2. Create the folders above. Delete the Vite starter CSS and demo code.
-3. Add `.env` with `VITE_API_URL` and commit `.env.example`. Keep `.env` in `.gitignore`.
-4. Make sure the backend allows your Vite origin in CORS.
-
-### Task 1.2: Axios instance (0.5 hr)
-`api/axios.js`:
-1. `axios.create({ baseURL: import.meta.env.VITE_API_URL })`.
-2. Request interceptor: read the token from `localStorage` and set the `Authorization` header.
-3. Response interceptor: on `401`, clear the stored token and user and send the person to `/login`.
-
-### Task 1.3: AuthContext (1.5 hrs)
-State: `user`, `token`, `loading` (true while restoring the session).
-1. On first load, if a token exists in `localStorage`, call `GET /auth/me` to restore `user`. On failure, clear everything.
-2. `login(email, password)`: call the API, store the token, set `user`.
-3. `register(data)`: call the API, then log in (or store the returned token).
-4. `logout()`: clear token, user and the cart.
-5. Export a `useAuth()` hook and an `isAdmin` boolean.
-6. Never store the password anywhere. Only the token (and optionally the user object) goes in `localStorage`.
-
-### Task 1.4: Routing and guards (1 hr)
-1. `main.jsx`: `<BrowserRouter>` → `<AuthProvider>` → `<CartProvider>` → `<App />`.
-2. `ProtectedRoute`: if `loading` show `<Loader />`; if no user, `<Navigate to="/login" />` and remember where they came from.
-3. `RoleRoute role="admin"`: if the role does not match, redirect to `/` (or show a 403 page).
-4. Route table in `App.jsx`:
-
-| Path | Page | Access |
-|---|---|---|
-| `/` | Home | public |
-| `/login`, `/register` | Login, Register | public (redirect away if logged in) |
-| `/menu` | Menu | public |
-| `/cart`, `/checkout` | Cart, Checkout | user |
-| `/orders`, `/orders/:id` | MyOrders, OrderDetail | user |
-| `/profile` | Profile | logged in |
-| `/admin` and `/admin/*` | admin pages | admin |
-| `*` | NotFound | public |
-
-### Task 1.5: Login and Register pages (0.5 hr)
-- Controlled forms. Show the backend `message` on failure (`err.response?.data?.message`).
-- Disable the submit button while the request is running.
-- After login, send an admin to `/admin` and a user to `/menu`.
-- Do **not** send a `role` field on register.
-
-### Check: Phase 1
-- Refresh the page while logged in: you stay logged in.
-- Open `/cart` logged out: redirected to `/login`.
-- Log in as a user and open `/admin`: you are kept out.
-- Wrong password shows the backend's "Invalid credentials" message.
-
-**Done when:** a person can register, log in, refresh, log out, and the guards hold.
+> **Tip:** values from an `<input>` are always **strings**. Convert `price`, `guests`, `quantity` etc. to numbers before sending.
 
 ---
 
-## Phase 2: Menu Browsing, Public Side (3 hrs)
+## Flow of the app (read this before coding)
 
-### Task 2.1: Navbar (0.5 hr)
-- Logged out: Menu, Login, Register.
-- User: Menu, Cart (with item count badge), My Orders, Profile, Logout.
-- Admin: Dashboard, Menu, Categories, Tables, Orders, Users, Logout.
+### 1. Where the data lives
+- `AuthContext`: `user`, `token`, and the functions `login`, `register`, `logout`.
+- `CartContext`: `cart` and the functions `addToCart`, `updateQuantity`, `removeItem`, `clearCart`.
+- `NavContext`: `page` and `goTo`.
+- Lists like menu items or orders can stay in `useState` inside the page that shows them. Not everything needs to be in context (see the "when to use Context" part of `CONTEXT-API-EXPLAINED.md`).
 
-### Task 2.2: Menu page (1.5 hrs)
-1. Fetch `GET /menu` and `GET /categories` on load.
-2. `MenuFilters`: category dropdown, veg-only toggle, search box, min/max price, sort (`price` / `-price`).
-3. **Debounce** the search box (about 400 ms) so you do not hit the API on every key.
-4. `Pagination` component driven by `page` and `limit`; keep the filters in the URL query string so a refresh keeps them.
-5. `MenuCard`: image, name, price, veg/non-veg marker, prep time, "Add to cart" button.
-6. States: loading, error, and an empty "No dishes found" message.
+### 2. Login flow
+```
+user types in Login form  (useReducer for email + password)
+  → onSubmit → preventDefault → login(email, password) from context
+  → context calls POST /auth/login, saves token + user in state
+  → goTo("admin-dashboard") if role is admin, else goTo("menu")
+```
+Show the backend `message` if it fails (`err.response?.data?.message`). Do **not** send a `role` field while registering.
 
-### Task 2.3: Menu item detail (0.5 hr)
-Open `GET /menu/:id` in a modal or at `/menu/:id`. Show description and a quantity picker.
+### 3. Every protected call
+`api.js` only creates the axios instance. Because we have no interceptors or storage, pass the token in the call:
 
-### Task 2.4: Add to cart from the menu (0.5 hr)
-- Logged out: send to `/login`.
-- Admin: hide the button (admins have no cart).
-- Show a small success or error message; do not use `alert()`.
+```
+api.get("/cart", { headers: { Authorization: `Bearer ${token}` } })
+```
 
-### Check: Phase 2
-- Each filter narrows the list; combined filters work together.
-- Page 2 loads and the URL reflects it.
-- A sold-out item set by admin no longer appears for users.
+Keep this inside the context functions so the components never touch the token.
 
-**Done when:** anyone can browse and filter the menu.
+### 4. Cart flow
+```
+user clicks "Add to cart" on a MenuCard
+  → addToCart(menuItemId, 1) from CartContext
+  → POST /cart → update `cart` state from the response
+Navbar reads cart from context → shows item count
+```
 
----
+### 5. Checkout flow
+```
+user picks order type: dine-in OR delivery   (a state value + conditional rendering)
+dine-in   → guests, date/time, table (load free tables on a button click: "Find tables")
+delivery  → street, city, pincode, phone
+payment   → cash or online
+submit    → POST /orders  (send only what the backend asks for, never totals)
+success   → clearCart state, goTo("orders")
+failure   → show the backend message (table already booked, capacity too small, ...)
+```
+Show an **estimate** of tax (5%) and delivery fee (₹40, free above ₹500) but label it "estimate". The server decides the final amount.
 
-## Phase 3: Cart and Checkout (3.5 hrs)
+### 6. Admin order flow
+Show **only the next valid status** as a button (for a dine-in order in `ready` → "Mark served"). The backend still checks it, the UI should just not offer a wrong jump. Keep the status order in a plain object:
 
-### Task 3.1: CartContext (1 hr)
-State: `cart`, `loading`, `error`. Load the cart when a `user` (role `user`) is present; clear it on logout.
-- `fetchCart()`, `addToCart(menuItemId, quantity)`, `updateQuantity(menuItemId, quantity)` (0 removes), `removeItem(menuItemId)`, `clearCart()`.
-- After each write, update state from the response (or refetch) so the UI never drifts from the server.
-- Derive `itemCount` and `total` from the cart; the **server** total is the one that counts at checkout.
-- Export `useCart()`.
-
-### Task 3.2: Cart page (1 hr)
-- `CartItem`: name, price, quantity stepper (+ / −), remove button, line total.
-- Show subtotal and a "Proceed to checkout" button. Disable it when the cart is empty.
-- Empty state with a link to `/menu`.
-- Show a clear message when the server rejects an item as unavailable.
-
-### Task 3.3: Checkout page (1.5 hrs)
-1. A toggle for **order type**: `dine-in` or `delivery`.
-2. **Dine-in** fields: number of guests, reservation date and time, and a table picker loaded from `GET /tables/available?guests=&time=`. Reload the tables whenever guests or time change. Block past times.
-3. **Delivery** fields: pick a saved address or type a new one (`street`, `city`, `pincode`, `phone`). Offer "save this address" which calls `POST /auth/me/addresses`.
-4. Payment method: `cash` or `online`.
-5. Show a **preview** only (subtotal, 5% tax, delivery fee 40, free above ₹500). Label it as an estimate; the server recalculates.
-6. Submit `POST /orders`. Send only what the contract needs, never totals.
-7. On success: clear the cart in context and go to `/orders/:id`. On failure show the backend message (table taken, capacity too small, etc.).
-
-### Check: Phase 3
-- Add, change quantity, remove and clear all work and survive a refresh.
-- Dine-in with too many guests shows the backend error.
-- Delivery without an address is blocked in the form and by the server.
-- After a successful order the cart badge shows 0.
-
-**Done when:** a user can go from menu to a placed order of either type.
+```
+const nextStatus = {
+  "dine-in":  { placed: "confirmed", confirmed: "preparing", ... },
+  "delivery": { placed: "confirmed", confirmed: "preparing", ... },
+};
+```
 
 ---
 
-## Phase 4: My Orders and Profile (2.5 hrs)
+## Step-by-step tasks
 
-### Task 4.1: My Orders (1 hr)
-- `GET /orders/my` with filters for status and order type.
-- `OrderCard`: id, date, type, `StatusBadge`, total, "View" link. Newest first.
+### Phase 1: Setup and Login (3 hrs)
 
-### Task 4.2: Order detail (1 hr)
-- `GET /orders/:id`: items (snapshot name and price), subtotal, tax, fee, total, payment status, and the table or delivery address depending on type.
-- A status **timeline** that shows the right steps for dine-in versus delivery.
-- "Cancel order" button, shown **only** while the status is `placed`. Confirm with an inline "Are you sure?" step (no `window.confirm`). Show the backend message on failure.
-- Add a manual "Refresh" button, or poll every 20-30 seconds while the order is not finished (and clean up the interval in the effect).
+**Task 1.1: Project setup (0.5 hr)**
+1. Create a Vite + React project inside `frontend/`, same as `tdl`. Install `axios`.
+2. Clean `App.jsx`, `App.css`, `index.css`.
+3. Create the folders above.
+4. Ask the backend developer (or check `server.js`) that CORS allows your Vite port.
 
-### Task 4.3: Profile (0.5 hr)
-- Edit name and phone (`PUT /auth/me`).
-- List, add and delete saved addresses.
+**Task 1.2: `api.js` (0.25 hr)**
+`axios.create({ baseURL: "http://localhost:5000/api" })`. Change the port to match your backend.
 
-### Check: Phase 4
-- Someone else's order id in the URL shows a proper "not allowed" message, not a blank screen.
-- Cancel disappears once the admin moves the order to `confirmed`.
+**Task 1.3: `NavContext` (0.5 hr)**
+`page` (starts at `"menu"`), `goTo`. Wrap `App` in it inside `main.jsx`.
 
-**Done when:** a user can follow and manage their own orders.
+**Task 1.4: `AuthContext` (1 hr)**
+`user`, `token`, `login`, `register`, `logout`. On `logout`, set both back to `null` and `goTo("login")`.
+
+**Task 1.5: Login and Register screens (0.75 hr)**
+Controlled forms with `useReducer`, error message, button disabled while the request is running.
+
+**Check:**
+- Wrong password shows "Invalid credentials".
+- Admin lands on the dashboard, user lands on the menu.
+- Logout brings you back to the login screen.
 
 ---
 
-## Phase 5: Admin Panel and Polish (3 hrs)
+### Phase 2: Navbar and Menu (3 hrs)
 
-### Task 5.1: Dashboard (0.5 hr)
-`GET /admin/stats`: cards for total orders, orders today, revenue today and total; lists for orders by type and by status; a top 5 selling items table.
+**Task 2.1: Navbar (0.5 hr)**
+Different links using conditional rendering:
+- Not logged in: Menu, Login, Register.
+- User: Menu, Cart (with count), My Orders, Profile, Logout.
+- Admin: Dashboard, Menu, Categories, Tables, Orders, Logout.
 
-### Task 5.2: Manage menu and categories (1 hr)
-- **Menu table** with all items (including unavailable), an availability toggle (`PATCH /menu/:id/availability`), edit and delete.
-- Add/edit form in a modal or on its own page: name, description, price, category, image URL, veg flag, preparation time.
-- **Categories:** list, create, rename, delete. Show the backend message when delete is blocked because items still use it.
+**Task 2.2: Menu screen (1.5 hrs)**
+1. Load categories and menu when the Menu link is clicked.
+2. `MenuFilters` (controlled inputs): category dropdown, veg-only checkbox, search text, min and max price, sort.
+3. Filters are applied only when the person presses **Apply** (no live search).
+4. `Previous` / `Next` buttons using a `page` number in `useState`.
+5. `MenuCard`: name, description, price (₹), veg or non-veg marker, preparation time, "Add to cart".
+6. Show "Loading...", an error message, and "No dishes found" when the list is empty.
 
-### Task 5.3: Manage tables (0.5 hr)
-List with number, capacity, status. Create, edit, delete. Disable delete for `reserved` / `occupied` tables.
+**Task 2.3: Add to cart rules (0.5 hr)**
+- Not logged in → send to login.
+- Admin → hide the button.
+- Show a small message in the page for success or failure (no `alert()`).
 
-### Task 5.4: Admin orders (1 hr)
-1. List with filters (status, type, date) and pagination.
-2. Detail page with customer info.
-3. Show **only the next valid status** as the action button (for example a dine-in order in `ready` offers "Mark served"). The backend still enforces it; the UI just should not offer invalid jumps.
-4. "Mark cash as paid" button for cash orders.
-5. Cancel allowed only from `placed` / `confirmed`.
+**Task 2.4: Sold out items (0.5 hr)**
+If the backend returns an item with `isAvailable: false` (admin view), show "Sold out" and disable the button.
 
-### Task 5.5: Users (optional, 0.25 hr)
-List users and open one user's orders.
+**Check:**
+- Each filter works alone and together.
+- Page 2 shows different dishes.
+- An item the admin marked unavailable no longer shows for a user.
 
-### Task 5.6: Polish (0.75 hr)
-- One shared `Loader`, `ErrorMessage` and empty-state style across the app.
-- Responsive layout that works on a phone width.
-- No `console.log` left in finished code.
-- Fix every ESLint warning (`npm run lint`).
-- `npm run build` passes.
+---
 
-### Check: Phase 5
-- User token cannot reach any admin page; admin token cannot reach the cart.
-- Walk one dine-in and one delivery order through every status from the admin panel, and watch it update on the user's order page.
-- Completing a dine-in order makes the table `available` again in Manage Tables.
-- Dashboard numbers match the orders you created.
+### Phase 3: Cart and Checkout (3.5 hrs)
 
-**Done when:** the admin can run the restaurant from the UI alone.
+**Task 3.1: `CartContext` (1 hr)**
+`cart`, `addToCart`, `updateQuantity` (0 removes), `removeItem`, `clearCart`. After every call, set `cart` from the server response so the screen never goes out of sync. Calculate `itemCount` from the cart array.
+
+**Task 3.2: Cart screen (1 hr)**
+- `CartItem`: name, price, `+` / `−` buttons, remove button, line total.
+- Subtotal, and a "Proceed to checkout" button that is disabled when the cart is empty.
+- Empty message with a button to go to the menu.
+
+**Task 3.3: Checkout screen (1.5 hrs)**
+Follow the checkout flow above. One `useReducer` can hold all the form fields; `type` is the field name, just like `AddTask` in `tdl`.
+
+**Check:**
+- Dine-in with more guests than the table capacity shows the backend message.
+- Delivery with a missing address is stopped.
+- After a successful order, the cart count in the Navbar becomes 0.
+
+---
+
+### Phase 4: My Orders and Profile (2.5 hrs)
+
+**Task 4.1: My Orders (1 hr)**
+Load `GET /orders/my` on click. `OrderCard` shows id, date, type, status, total, and a "View" button. Add two dropdowns to filter by status and type.
+
+**Task 4.2: Order detail (1 hr)**
+- Items with the name and price saved at the time of the order, tax, delivery fee, total, payment status, and the table or the address depending on the type.
+- A **status timeline**: keep the list of steps in an array and `.map()` over it, highlighting the steps already done using a conditional style.
+- "Cancel order" button, visible **only** when the status is `placed`. Ask "Are you sure?" with a second button on the page (do not use `window.confirm`).
+- A "Refresh" button to get the latest status.
+
+**Task 4.3: Profile (0.5 hr)**
+Edit name and phone. List saved addresses with add and delete.
+
+**Check:**
+- Opening another person's order shows a clear "not allowed" message, not a blank page.
+- Cancel button disappears once the admin confirms the order.
+
+---
+
+### Phase 5: Admin Screens (3 hrs)
+
+**Task 5.1: Dashboard (0.5 hr)**
+Show `GET /admin/stats` as simple cards and lists: total orders, orders today, revenue today and total, orders by type, orders by status, top 5 items.
+
+**Task 5.2: Manage menu and categories (1 hr)**
+- List all items with an availability toggle, Edit and Delete.
+- Menu form (add and edit in the same form, like `ProductForm` in the inventory assignment): name, description, price, category, image URL, veg, preparation time.
+- Categories: list, add, rename, delete. Show the backend message when delete is blocked.
+
+**Task 5.3: Manage tables (0.5 hr)**
+List number, capacity, status. Add, edit, delete. Disable delete for reserved or occupied tables.
+
+**Task 5.4: Admin orders (1 hr)**
+List with status and type filters. Show only the **next valid status** button, a "Mark cash as paid" button, and Cancel (only for `placed` or `confirmed`).
+
+**Check:**
+- A user account cannot see any admin screen, and the admin has no Cart link.
+- Take one dine-in and one delivery order through every status.
+- Completing a dine-in order makes the table `available` again.
+
+---
+
+### Phase 6: Clean-up (1 hr)
+- Same look for loading, error and empty messages in every screen.
+- Remove every `console.log`.
+- Fix all ESLint warnings (`npm run lint`).
+- `npm run build` runs without errors.
+- Check the layout once on a mobile width.
 
 ---
 
 ## Time Split
 
 | Phase | Hours |
-|---|---|
-| 1. Setup, Routing, Auth | 4 |
-| 2. Menu Browsing | 3 |
+| --- | --- |
+| 1. Setup and Login | 3 |
+| 2. Navbar and Menu | 3 |
 | 3. Cart and Checkout | 3.5 |
 | 4. My Orders and Profile | 2.5 |
-| 5. Admin Panel and Polish | 3 |
+| 5. Admin Screens | 3 |
+| 6. Clean-up | 1 |
 | **Total** | **16** |
 
-## Screen Access Summary
+## Who sees what
 
-| Screen | Public | User | Admin |
-|---|---|---|---|
-| Home, Menu | ✅ | ✅ | ✅ |
-| Login / Register | ✅ | redirect | redirect |
+| Screen | Not logged in | User | Admin |
+| --- | --- | --- | --- |
+| Menu | ✅ | ✅ | ✅ |
+| Login / Register | ✅ | ❌ | ❌ |
 | Cart, Checkout | ❌ | ✅ | ❌ |
 | My Orders, Order detail | ❌ | ✅ | ❌ |
 | Profile | ❌ | ✅ | ✅ |
 | Dashboard, Manage menu / categories / tables | ❌ | ❌ | ✅ |
-| Admin orders, Users | ❌ | ❌ | ✅ |
+| Admin orders | ❌ | ❌ | ✅ |
 
 ## Submission Checklist
-- [ ] Runs with `npm run dev` against the backend; API URL only in `.env`
-- [ ] `.env` in `.gitignore`, `.env.example` committed
-- [ ] Context, api, routes, components and pages are separated as in the folder structure
-- [ ] No hard-coded API URLs or tokens outside `api/axios.js` and `AuthContext`
-- [ ] Every page handles loading, error and empty states
+- [ ] Runs with `npm run dev` and talks to the backend
+- [ ] Only the topics from the Rules table are used (plus `axios`)
+- [ ] No `useEffect`, no router, no `localStorage`
+- [ ] The API URL is written only in `api.js`
+- [ ] Contexts, components and admin screens are in separate files as shown above
+- [ ] Every screen shows loading, error and empty messages
 - [ ] `npm run lint` and `npm run build` pass
 - [ ] One commit per phase
