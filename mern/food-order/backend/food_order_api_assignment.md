@@ -63,6 +63,9 @@ food-order-api/
 │   ├── cartRoutes.js
 │   ├── orderRoutes.js
 │   └── adminRoutes.js
+├── utils/
+│   ├── AppError.js      # error with a status code
+│   └── respond.js       # { status, message, data } helper + pagination helpers
 ├── .env
 ├── app.js
 ├── seed.js              # admin + categories + tables
