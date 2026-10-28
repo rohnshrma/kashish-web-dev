@@ -23,7 +23,7 @@ export default function TodoForm() {
     } catch (err) {
       setError(err.response?.data?.message || "could not add task");
     } finally {
-      setSaving;
+      setSaving(false);
     }
   };
 

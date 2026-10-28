@@ -75,11 +75,11 @@ export const updateTodo = async (req, res) => {
       });
     }
 
-    const todo = await Todo.findByIdAndUpdate(req.params.id, {
-      $set: updates,
-      new: true,
-      runValidators: true,
-    });
+    const todo = await Todo.findByIdAndUpdate(
+      req.params.id,
+      { $set: updates },
+      { new: true, runValidators: true },
+    );
 
     if (!todo) {
       return res

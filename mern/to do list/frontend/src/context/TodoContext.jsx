@@ -40,9 +40,9 @@ export function TodoProvider({ children }) {
 
   const updateTodo = async (id, updates) => {
     const response = await axios.patch(`${API_URI}/${id}`, updates);
-    setTodos((prevTasks) => {
-      prevTasks.map((todo) => (todo._id === id ? response.data.data : todo));
-    });
+    setTodos((prevTasks) =>
+      prevTasks.map((todo) => (todo._id === id ? response.data.data : todo)),
+    );
   };
 
   return (
