@@ -1,10 +1,11 @@
-import { useAuth } from "../context/AuthContext";
-import { useBlogs } from "../context/BlogContext";
+import { useContext } from "react";
+import AuthContext from "../AuthContext";
+import BlogContext from "../BlogContext";
 
 // Shows only the logged-in user's posts, with a delete button.
 const MyPosts = () => {
-  const { user } = useAuth();
-  const { posts, deletePost } = useBlogs();
+  const { user } = useContext(AuthContext);
+  const { posts, deletePost } = useContext(BlogContext);
   const mine = posts.filter((p) => p.author === user.name);
 
   if (mine.length === 0) return <p>You have no posts yet.</p>;

@@ -31,25 +31,25 @@ Keep: `InventoryContext` (products + `addProduct`, `updateProduct`, `deleteProdu
 
 ```
 src/
-├── main.jsx
+├── main.jsx                    <- wrap in BrowserRouter
 ├── App.jsx                     <- route table (Routes / Route)
 ├── InventoryContext.jsx
 ├── AuthContext.jsx             <- NEW: user, login, logout
 └── Components/
-    ├── Layout.jsx              <- NEW: Header + <Outlet />
-    ├── ProtectedRoute.jsx      <- NEW: private route guard
     ├── Header.jsx
     ├── ProductForm.jsx
     ├── ProductList.jsx
-    └── ProductItem.jsx
-└── pages/                      <- NEW
-    ├── InventoryPage.jsx       (summary + ProductList)
-    ├── ProductDetailPage.jsx
-    ├── AddProductPage.jsx
-    ├── EditProductPage.jsx
-    ├── LoginPage.jsx
-    └── NotFoundPage.jsx
+    ├── ProductItem.jsx
+    ├── Layout.jsx              <- NEW: Header + <Outlet />
+    ├── ProtectedRoute.jsx      <- NEW: private route guard
+    ├── InventoryPage.jsx       <- NEW: summary + ProductList
+    ├── ProductDetailPage.jsx   <- NEW
+    ├── AddProductPage.jsx      <- NEW
+    ├── EditProductPage.jsx     <- NEW
+    ├── LoginPage.jsx           <- NEW
+    └── NotFoundPage.jsx        <- NEW
 ```
+(A "page" is just a component that a `Route` points to, so it lives in `Components/` like everything else.)
 
 ## Steps
 

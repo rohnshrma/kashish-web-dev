@@ -1,9 +1,10 @@
+import { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import AuthContext from "../AuthContext";
 
 // PRIVATE ROUTE: allowed -> show the child route, not allowed -> go to /login
 const ProtectedRoute = () => {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const location = useLocation(); // where the user is trying to go
 
   if (!user) {

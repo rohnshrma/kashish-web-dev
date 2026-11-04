@@ -53,20 +53,26 @@ npm i react-router-dom
 | `/dashboard/new` | Write a new post | **logged in only** |
 | anything else | 404 | everyone |
 
-Files:
+Files (same structure as our `tdl` app and the inventory assignment: contexts in `src`, components in `src/Components`):
 ```
 src/
 ├── main.jsx                 BrowserRouter + providers
 ├── App.jsx                  all routes (URL -> component)
-├── context/
-│   ├── AuthContext.jsx      who is logged in
-│   └── BlogContext.jsx      the posts
-├── components/
-│   ├── Navbar.jsx           links
-│   └── ProtectedRoute.jsx   private route
-└── pages/
-    Home, Blogs, BlogDetail, Login, Dashboard, MyPosts, NewPost, NotFound
+├── AuthContext.jsx          who is logged in
+├── BlogContext.jsx          the posts
+└── Components/
+    ├── Navbar.jsx           links
+    ├── ProtectedRoute.jsx   private route
+    ├── Home.jsx             \
+    ├── Blogs.jsx             |
+    ├── BlogDetail.jsx        |  one component per page
+    ├── Login.jsx             |
+    ├── Dashboard.jsx         |
+    ├── MyPosts.jsx           |
+    ├── NewPost.jsx           |
+    └── NotFound.jsx         /
 ```
+Pages are just normal components. A "page" is only a component that a `Route` points to.
 
 ---
 
@@ -180,7 +186,7 @@ This is normal conditional rendering. If `user` is `null`, nothing is shown.
 Read the value in `BlogDetail.jsx`:
 ```jsx
 const { id } = useParams();            // URL /blogs/2  ->  id = "2"
-const { posts } = useBlogs();
+const { posts } = useContext(BlogContext);
 const post = posts.find((p) => p.id === id);
 ```
 
@@ -217,7 +223,7 @@ Used in the project:
 
 **After publishing** (`NewPost.jsx`):
 ```jsx
-const id = String(Date.now());
+const id = uuidv4();                   // from the uuid package, like in AddTask
 addPost({ id, title, body, author: user.name });
 navigate(`/blogs/${id}`);               // open the new post
 ```
@@ -312,12 +318,12 @@ const logout = () => setUser(null);
 - `user` is `null` (logged out) or `{ name }` (logged in).
 - `login` returns `true`/`false` so the form can show an error.
 - This is a **fake** login for learning. A real app asks the backend.
-- `useAuth()` is a shortcut: `export const useAuth = () => useContext(AuthContext);`
+- Any component reads it with `const { user, login, logout } = useContext(AuthContext);`, exactly like `TaskContext` in the to-do app.
 
 ### Step 2: the guard. `ProtectedRoute.jsx`
 ```jsx
 const ProtectedRoute = () => {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const location = useLocation();
 
   if (!user) {
@@ -327,7 +333,7 @@ const ProtectedRoute = () => {
 };
 ```
 Line by line:
-1. Get `user` from context.
+1. Get `user` from `AuthContext` with `useContext`.
 2. `useLocation()` gives info about the **current URL** (`pathname`, `search`, `state`).
 3. **Not logged in?** `<Navigate to="/login" />` redirects immediately.
    - `state={{ from: location }}` attaches a note: "they were trying to open this page".
@@ -396,7 +402,7 @@ Try `/random` in the browser to see it.
 
 `MyPosts.jsx` shows only the current user's posts:
 ```jsx
-const { user } = useAuth();
+const { user } = useContext(AuthContext);
 const mine = posts.filter((p) => p.author === user.name);
 ```
 We can use `user.name` without checking for `null`, because `ProtectedRoute` guarantees a logged-in user on this page.

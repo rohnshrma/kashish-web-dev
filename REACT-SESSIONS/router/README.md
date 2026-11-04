@@ -9,4 +9,4 @@ npm run dev
 
 Login: any name + password `123`.
 
-Read `react-router-dom.md` for the full explanation. Start with `src/App.jsx`.
+Read `react-router-dom.md` for the full explanation. Start with `src/App.jsx`. Structure follows the other sessions: contexts in `src`, components in `src/Components`.

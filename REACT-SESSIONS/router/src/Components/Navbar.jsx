@@ -1,8 +1,9 @@
+import { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import AuthContext from "../AuthContext";
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useContext(AuthContext);
 
   // NavLink passes { isActive } so we can highlight the current page.
   const style = ({ isActive }) => ({

@@ -1,9 +1,10 @@
+import { useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useBlogs } from "../context/BlogContext";
+import BlogContext from "../BlogContext";
 
 const BlogDetail = () => {
   const { id } = useParams(); // from path="/blogs/:id"  ->  "/blogs/2" gives id = "2"
-  const { posts } = useBlogs();
+  const { posts } = useContext(BlogContext);
   const navigate = useNavigate();
 
   const post = posts.find((p) => p.id === id); // ids are strings

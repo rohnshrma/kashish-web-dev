@@ -1,8 +1,9 @@
+import { useContext } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useBlogs } from "../context/BlogContext";
+import BlogContext from "../BlogContext";
 
 const Blogs = () => {
-  const { posts } = useBlogs();
+  const { posts } = useContext(BlogContext);
 
   // useSearchParams = useState that lives in the URL:  /blogs?search=react
   const [searchParams, setSearchParams] = useSearchParams();

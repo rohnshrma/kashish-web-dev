@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 
 const BlogContext = createContext();
 
@@ -21,5 +21,4 @@ export const BlogContextProvider = ({ children }) => {
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useBlogs = () => useContext(BlogContext);
+export default BlogContext;

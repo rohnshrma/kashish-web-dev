@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useBlogs } from "../context/BlogContext";
+import AuthContext from "../AuthContext";
+import BlogContext from "../BlogContext";
 
 const NewPost = () => {
-  const { user } = useAuth();
-  const { addPost } = useBlogs();
+  const { user } = useContext(AuthContext);
+  const { addPost } = useContext(BlogContext);
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -13,7 +14,7 @@ const NewPost = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     if (!title.trim() || !body.trim()) return;
-    const id = String(Date.now()); // simple unique id (string, like URL params)
+    const id = uuidv4();
     addPost({ id, title, body, author: user.name });
     navigate(`/blogs/${id}`); // go to the new post's page
   };

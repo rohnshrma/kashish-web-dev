@@ -1,14 +1,14 @@
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/Home";
-import Blogs from "./pages/Blogs";
-import BlogDetail from "./pages/BlogDetail";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import MyPosts from "./pages/MyPosts";
-import NewPost from "./pages/NewPost";
-import NotFound from "./pages/NotFound";
+import Navbar from "./Components/Navbar";
+import ProtectedRoute from "./Components/ProtectedRoute";
+import Home from "./Components/Home";
+import Blogs from "./Components/Blogs";
+import BlogDetail from "./Components/BlogDetail";
+import Login from "./Components/Login";
+import Dashboard from "./Components/Dashboard";
+import MyPosts from "./Components/MyPosts";
+import NewPost from "./Components/NewPost";
+import NotFound from "./Components/NotFound";
 
 // The route table: URL -> component.
 const App = () => {

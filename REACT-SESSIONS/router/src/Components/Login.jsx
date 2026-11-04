@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import AuthContext from "../AuthContext";
 
 const Login = () => {
-  const { user, login } = useAuth();
+  const { user, login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [name, setName] = useState("");
