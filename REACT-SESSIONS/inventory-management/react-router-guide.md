@@ -1,7 +1,7 @@
 # Part 2: Add React Router to your Inventory Manager
 
 > Do this **only after** the main assignment (`assignment.md`) is complete and pushed. The assignment bans routing on purpose; this is the follow-up.
-> Concepts reference: `../router/react-router-dom.md`. Working demo: `../router/`.
+> Concepts reference: `../router/react-router-dom.md`. Working demo (blog app): `../router/`.
 
 ## Goal
 
@@ -32,7 +32,7 @@ Keep: `InventoryContext` (products + `addProduct`, `updateProduct`, `deleteProdu
 ```
 src/
 ├── main.jsx
-├── router.jsx                  <- NEW: route table
+├── App.jsx                     <- route table (Routes / Route)
 ├── InventoryContext.jsx
 ├── AuthContext.jsx             <- NEW: user, login, logout
 └── Components/
@@ -57,40 +57,34 @@ src/
 ```bash
 npm i react-router-dom
 ```
-`main.jsx`: wrap in providers, then `RouterProvider`:
+`main.jsx`: wrap everything in `BrowserRouter`, then the providers:
 ```jsx
-<AuthContextProvider>
-  <InventoryContextProvider>
-    <RouterProvider router={router} />
-  </InventoryContextProvider>
-</AuthContextProvider>
+<BrowserRouter>
+  <AuthContextProvider>
+    <InventoryContextProvider>
+      <App />
+    </InventoryContextProvider>
+  </AuthContextProvider>
+</BrowserRouter>
 ```
-(Context providers go **outside** the router so every route can use them.)
 
 ### Step 2: Layout with `Outlet`
 `Layout` renders `Header` (with `NavLink`s: Inventory, Add Product, Login/Logout) and `<Outlet />`. Move the header summary here.
 
-### Step 3: Route table (`router.jsx`)
+### Step 3: Route table (`App.jsx`)
 ```jsx
-createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      { index: true, element: <InventoryPage /> },
-      { path: "products/:id", element: <ProductDetailPage /> },
-      { path: "login", element: <LoginPage /> },
-      {
-        element: <ProtectedRoute />,            // guard for the group below
-        children: [
-          { path: "products/new", element: <AddProductPage /> },
-          { path: "products/:id/edit", element: <EditProductPage /> },
-        ],
-      },
-      { path: "*", element: <NotFoundPage /> },
-    ],
-  },
-]);
+<Routes>
+  <Route path="/" element={<Layout />}>
+    <Route index element={<InventoryPage />} />
+    <Route path="products/:id" element={<ProductDetailPage />} />
+    <Route path="login" element={<LoginPage />} />
+    <Route element={<ProtectedRoute />}>             {/* guard for the group below */}
+      <Route path="products/new" element={<AddProductPage />} />
+      <Route path="products/:id/edit" element={<EditProductPage />} />
+    </Route>
+    <Route path="*" element={<NotFoundPage />} />
+  </Route>
+</Routes>
 ```
 React Router ranks routes by specificity, so `products/new` wins over `products/:id`.
 
@@ -118,8 +112,8 @@ Move the search text and category filter from `useState` to `useSearchParams` (`
 
 | Allowed | Still not allowed |
 | --- | --- |
-| `react-router-dom`: `createBrowserRouter`, `RouterProvider`, `Outlet`, `Link`, `NavLink`, `Navigate`, `useNavigate`, `useParams`, `useLocation`, `useSearchParams` | `useEffect`, `fetch`, `localStorage` |
-| Everything from the main assignment | Loaders/actions (we use them with real APIs later) |
+| `react-router-dom`: `BrowserRouter`, `Routes`, `Route`, `Outlet`, `Link`, `NavLink`, `Navigate`, `useNavigate`, `useParams`, `useLocation`, `useSearchParams` | `useEffect`, `fetch`, `localStorage` |
+| Everything from the main assignment | `createBrowserRouter`, loaders, actions (later, with real APIs) |
 
 ## Checklist
 
@@ -139,4 +133,4 @@ Move the search text and category filter from `useState` to `useSearchParams` (`
 3. Why does `ProtectedRoute` pass `state={{ from: location }}`, and what happens without it?
 4. Why `replace` on the login redirect?
 5. A user hides the Edit button with devtools / types `/products/1/edit` after logging out of the UI. What actually stops them in a real app, and why is the route guard not enough?
-6. Why must the context providers be outside `RouterProvider`?
+6. Why must `BrowserRouter` wrap the whole app?

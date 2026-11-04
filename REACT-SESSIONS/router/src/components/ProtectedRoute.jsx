@@ -1,22 +1,17 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-// PRIVATE ROUTE. Used as a layout route (no path) that wraps other routes.
-//   <Route element={<ProtectedRoute />}>  ...children are protected...  </Route>
-// `role` is optional: <ProtectedRoute role="admin" /> also checks the role.
-const ProtectedRoute = ({ role }) => {
+// PRIVATE ROUTE: allowed -> show the child route, not allowed -> go to /login
+const ProtectedRoute = () => {
   const { user } = useAuth();
-  const location = useLocation();
+  const location = useLocation(); // where the user is trying to go
 
   if (!user) {
-    // Not logged in -> go to /login and remember where they wanted to go.
-    // `replace` so the Back button doesn't bounce them back to the guarded page.
+    // `state` carries a note: "they wanted this page", so Login can send them back.
+    // `replace` so the Back button doesn't return to the blocked page.
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  if (role && user.role !== role) {
-    return <Navigate to="/unauthorized" replace />;
-  }
-  return <Outlet />; // allowed: render the matched child route
+  return <Outlet />; // logged in: render the matched child
 };
 
 export default ProtectedRoute;

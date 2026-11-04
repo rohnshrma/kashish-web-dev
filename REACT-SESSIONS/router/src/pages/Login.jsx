@@ -6,36 +6,30 @@ const Login = () => {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  // ProtectedRoute stored the page they wanted in location.state.from
+  // The page ProtectedRoute remembered (or /dashboard if they came to /login directly)
   const from = location.state?.from?.pathname || "/dashboard";
 
-  // Already logged in? Don't show the form.
-  if (user) return <Navigate to={from} replace />;
+  if (user) return <Navigate to={from} replace />; // already logged in
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (login(email, password)) {
-      navigate(from, { replace: true }); // go back to where they came from
+    if (login(name, password)) {
+      navigate(from, { replace: true }); // go where they wanted to go
     } else {
-      setError("Wrong email or password");
+      setError("Enter a name and the password 123");
     }
   };
 
   return (
-    <form onSubmit={submitHandler}>
+    <form onSubmit={submitHandler} style={{ padding: 12 }}>
       <h1>Login</h1>
-      <p>Try user@test.com / 123 or admin@test.com / 123</p>
-      <input placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      <p>Any name, password: 123</p>
+      <input placeholder="name" value={name} onChange={(e) => setName(e.target.value)} />
+      <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       <button>Login</button>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </form>

@@ -1,12 +1,12 @@
-# React Router demo
+# Blog app - React Router DOM (beginner to intermediate)
 
-Covers every core React Router feature: layout + `Outlet`, nested/index routes, `NavLink`, `useParams`, `useNavigate`, `useLocation`, `useSearchParams`, loaders, actions, `errorElement`, 404, lazy loading, and private / role-based routes.
+A very small blog that uses: `BrowserRouter`, `Routes`/`Route`, `Link`, `NavLink`, `useParams`, `useNavigate`, `useLocation`, `useSearchParams`, `Navigate`, nested routes with `Outlet`, a private route, and a 404 page.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Login: `user@test.com / 123` or `admin@test.com / 123`.
+Login: any name + password `123`.
 
-Read `react-router-dom.md` for the explanation. Start with `src/router.jsx`.
+Read `react-router-dom.md` for the full explanation. Start with `src/App.jsx`.

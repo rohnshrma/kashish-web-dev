@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 
-// Matched by path="*" - anything no other route matched.
+// Matched by path="*" : any URL no other route matched.
 const NotFound = () => (
-  <div>
+  <div style={{ padding: 12 }}>
     <h1>404 - Page not found</h1>
     <Link to="/">Go home</Link>
   </div>
