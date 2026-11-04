@@ -247,3 +247,9 @@ Do not add the product, and show an error message under the form (use state for 
 3. Why should totals in the `Header` be **calculated** and not stored in their own state?
 4. How did you make the form fill itself when "Edit" is clicked without `useEffect`?
 5. Why do we use `setProducts(prev => ...)` instead of `setProducts(products ...)`?
+
+---
+
+## Part 2 (after you finish and push everything above)
+
+Routing is intentionally not allowed in this assignment. Once it is done, continue with `react-router-guide.md` to add pages, URLs and a private route to the same app.
